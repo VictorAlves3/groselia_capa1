@@ -2,14 +2,14 @@ import pandas as pds
 import os
 import json
 
-from IPython.display import display, HTML
-
-#
 def run():
     files = ["./ddrs/" + x for x in os.listdir("./ddrs")]
 
     for ddr in files:
         principal(ddr)
+
+    return 0
+
 
 def principal(nome_arquivo):
     ddr = load_excel(nome_arquivo)
@@ -27,6 +27,8 @@ def principal(nome_arquivo):
 
     for fluxo in fluxos:
         gera_interface(fluxo, sigla)
+
+    return 0
 
 
 def trata_campos(dict_campo):
@@ -78,15 +80,18 @@ def trata_campos(dict_campo):
 
     return dict_campo
 
+
 # carrega layout
 def load_excel(path_arquivo):
     ddr = pds.read_excel(path_arquivo, sheet_name=None)
     return ddr
 
+
 def load_json(path_arquivo):
     json_data = open(path_arquivo).read()
     config_json = json.loads(json_data)
     return config_json
+
 
 def separa_abas(ddr):
     abas = {x[0] : ddr[x[0]] for x in ddr.items()}
@@ -100,6 +105,7 @@ def separa_abas(ddr):
             fluxos.append(aba)
 
     return indice, fluxos
+
 
 def gera_interface(aba, sigla):
     interface_path = "./sigla/" + sigla + "/interface/"
@@ -130,7 +136,8 @@ def gera_interface(aba, sigla):
         json.dump(campos,file,indent=4, ensure_ascii=False)
         file.close()
 
-    return None
+    return 0
+
 
 def gera_fluxos(sigla, indice):
     config_json_path = "./config_model.json"
@@ -169,6 +176,9 @@ def gera_fluxos(sigla, indice):
             json.dump(config_json,file,indent=4)
 
         open(fluxo_py,"w").close()
+
+    return 0
+
 
 def configura_dict_config(dict_entrada, fluxo):
     fluxo = fluxo.lower()
