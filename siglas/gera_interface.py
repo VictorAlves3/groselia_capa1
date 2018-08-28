@@ -4,6 +4,7 @@ import json
 
 from IPython.display import display, HTML
 
+#
 def run():
     files = ["./ddrs/" + x for x in os.listdir("./ddrs")]
 
@@ -14,25 +15,25 @@ def principal(nome_arquivo):
     ddr = load_excel(nome_arquivo)
     indice, fluxos = separa_abas(ddr)
     sigla = (indice.keys()[1].split("-")[-1].strip() + "0")[-3:].lower()
-    
+
     print("""
 #############################################
-###    trabalhando com ddr da sigla """ + sigla + """   ### 
+###    trabalhando com ddr da sigla """ + sigla + """   ###
 ############################################# """)
 
     gera_fluxos(sigla, indice)
-    
+
     print("         GERANDO INTERFACES        ")
 
     for fluxo in fluxos:
         gera_interface(fluxo, sigla)
-        
+
 
 def trata_campos(dict_campo):
     entrada = dict_campo["input"]
     saida = dict_campo["output"]
     tipo = dict_campo["type"]
-    tipo_dado = dict_campo["data_type"] 
+    tipo_dado = dict_campo["data_type"]
     tamanho = dict_campo["data_size"]
     dict_campo.pop("input")
 
@@ -121,7 +122,7 @@ def gera_interface(aba, sigla):
         campo["data_size"] = str(linha[4])
         campo = trata_campos(campo)
         campos.append(campo)
-        
+
     if not os.path.exists(interface_path):
         os.makedirs(interface_path)
 
@@ -156,7 +157,7 @@ def gera_fluxos(sigla, indice):
 
     if not os.path.exists(schema_path):
         os.makedirs(schema_path)
-    print("         GERANDO FLUXOS       ")  
+    print("         GERANDO FLUXOS       ")
     for fluxo in fluxos:
         print(">>> gerando fluxo " + fluxo[0])
         fluxo_py = sigla_base_path + tabela + fluxo[0] + "_" + sigla + ".py"
@@ -168,13 +169,14 @@ def gera_fluxos(sigla, indice):
             json.dump(config_json,file,indent=4)
 
         open(fluxo_py,"w").close()
-            
+
 def configura_dict_config(dict_entrada, fluxo):
     fluxo = fluxo.lower()
     if "cto" in fluxo:
         dict_entrada["tipo_processamento"] = "odscto"
     elif "blce" in fluxo:
         dict_entrada["tipo_processamento"] = "odsddo"
+
     if "mes" in fluxo:
         dict_entrada["periodicidade"] = "m"
         dict_entrada["periodicidade_upper"] = "M"
@@ -184,14 +186,12 @@ def configura_dict_config(dict_entrada, fluxo):
 
     return dict_entrada
 
-   
 
-
+# main
 try:
     run()
 except Exception as identifier:
     print(identifier)
-
 
 input("precione enter para finalizar")
 
