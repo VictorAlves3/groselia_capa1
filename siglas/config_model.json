@@ -1,0 +1,27 @@
+{
+    "projeto": "imf",
+    "codigo_sistema": "yl0",
+    "codigo_conteudo": "cta",
+    "codigo_sistema_origem": "yl0",
+    "tipo_processamento": "odscto",
+    "codigo_pais": "55",
+    "codigo_entidade": "0033",
+    "periodicidade": "m",
+    "periodicidade_upper": "M",
+    "tipo_carga": "full",
+    "latencia": "0",
+    "entrada": {
+        "layout_principal": "",
+        "layout_motor": "",
+        "layout_outros": []
+    },
+    "saida": {
+        "interface": "",
+        "layout_rechaco_2": ""
+    },
+    "dominio": {
+        "cod_centro": {
+            "schema": "he0_dm_centro"
+        }
+    }
+}
