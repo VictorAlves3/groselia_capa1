@@ -14,19 +14,19 @@ def run():
 def principal(nome_arquivo):
     ddr = load_excel(nome_arquivo)
     indice, fluxos = separa_abas(ddr)
-    sigla = (indice.keys()[1].split("-")[-1].strip() + "0")[-3:].lower()
+    codigo_sistema = (indice.keys()[1].split("-")[-1].strip())[-2:].lower()
 
     print("""
 #############################################
-###    trabalhando com ddr da sigla """ + sigla + """   ###
+###    trabalhando com ddr do codigo_sistema """ + codigo_sistema + """   ###
 ############################################# """)
 
-    gera_fluxos(sigla, indice)
+    gera_fluxos(codigo_sistema, indice)
 
     print("         GERANDO INTERFACES        ")
 
     for fluxo in fluxos:
-        gera_interface(fluxo, sigla)
+        gera_interface(fluxo, codigo_sistema)
 
     return 0
 
@@ -107,8 +107,8 @@ def separa_abas(ddr):
     return indice, fluxos
 
 
-def gera_interface(aba, sigla):
-    interface_path = "./sigla/" + sigla + "/interface/"
+def gera_interface(aba, codigo_sistema):
+    interface_path = "./siglas/{}0/interface/".format(codigo_sistema)
     linhas = aba.values
     nome = aba.keys()[1]
     descricao = linhas[0][1]
@@ -132,45 +132,48 @@ def gera_interface(aba, sigla):
     if not os.path.exists(interface_path):
         os.makedirs(interface_path)
 
-    with open(interface_path + interface_name.lower() + "_" + sigla + ".json","w",encoding='utf8') as file:
+    with open(interface_path + interface_name.lower() + "_" + codigo_sistema + ".json","w",encoding='utf8') as file:
         json.dump(campos,file,indent=4, ensure_ascii=False)
         file.close()
 
     return 0
 
 
-def gera_fluxos(sigla, indice):
+def gera_fluxos(codigo_sistema, indice):
     config_json_path = "./config_model.json"
     config_json = load_json(config_json_path)
     fluxos = []
+    colunas = [list(x) for x in indice.values if "Nome" in str(x[0])][0]
+    col = {str(x).strip() : colunas.index(x) for x in colunas}
 
     for linha in indice.values:
         linha_concat = " ".join([str(x).lower() for x in linha])
-        if sigla in linha_concat:
-            fluxo = (str(linha[0]).lower(), str(linha[3]).lower())
+        if codigo_sistema + "0" in linha_concat:
+            fluxo = [str(x) for x in linha]
             fluxos.append(fluxo)
 
-    sigla_base_path = "./sigla/" + sigla + '/'
-    schema_path = sigla_base_path + "schema/"
+    codigo_sistema_base_path = "./siglas/{}0/".format(codigo_sistema)
+    schema_path = codigo_sistema_base_path + "schema/"
     tabela = "wf_ex_imf_"
 
     # configurar json_config
-    config_json["codigo_sistema"] = sigla
-    config_json["codigo_sistema_origem"] = sigla
+    config_json["codigo_sistema"] = codigo_sistema
 
-    # cria pastas da sigla
-    if not os.path.exists(sigla_base_path):
-        os.makedirs(sigla_base_path)
+
+    # cria pastas da codigo_sistema
+    if not os.path.exists(codigo_sistema_base_path):
+        os.makedirs(codigo_sistema_base_path)
 
     if not os.path.exists(schema_path):
         os.makedirs(schema_path)
     print("         GERANDO FLUXOS       ")
     for fluxo in fluxos:
         print(">>> gerando fluxo " + fluxo[0])
-        fluxo_py = sigla_base_path + tabela + fluxo[0] + "_" + sigla + ".py"
-        fluxo_json = sigla_base_path + tabela +  fluxo[0] + "_" + sigla + ".json"
+        config_json["codigo_sistema_origem"] = fluxo[col["Sigla"]]
+        config_json["codigo_conteudo"] = fluxo[col["Contenido"]]
+        fluxo_py = "{}{}{}_{}_{}0.py".format(codigo_sistema_base_path, tabela, fluxo[col["Nome"]], config_json["codigo_conteudo"], codigo_sistema).lower()
+        fluxo_json = "{}{}{}_{}_{}0.json".format(codigo_sistema_base_path, tabela, fluxo[col["Nome"]], config_json["codigo_conteudo"], codigo_sistema).lower()
         config_json = configura_dict_config(config_json, fluxo[0])
-        config_json["codigo_conteudo"] = fluxo[1]
 
         with open(fluxo_json,"w") as file:
             json.dump(config_json,file,indent=4)

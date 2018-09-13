@@ -10,6 +10,7 @@
     "periodicidade_upper": "M",
     "tipo_carga": "full",
     "latencia": "0",
+    "save_csv": "true",
     "entrada": {
         "layout_principal": "",
         "layout_motor": "",
