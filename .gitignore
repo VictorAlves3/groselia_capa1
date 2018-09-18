@@ -2,3 +2,5 @@
 *.xls
 .vscode
 siglas/siglas
+interfaces_saida/describes/*.txt
+interfaces_saida/interfaces
