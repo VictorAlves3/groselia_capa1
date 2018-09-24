@@ -2,7 +2,7 @@
 ### Facilitadores de trabalho para equipe capa1
 
 ```diff
-- ### rode gere as interaces antes das siglas sempre
+- # rode gere as interaces antes das siglas sempre
 ```
 # Gera interfaces
 1. Coloque os describes na pasta interfaces_saida/describes
