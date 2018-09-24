@@ -1,9 +1,16 @@
 # Groselia_capa1
 ### Facilitadores de trabalho para equipe capa1
 
+```diff
+- ### rode gere as interaces antes das siglas sempre
+```
 # Gera interfaces
+1. Coloque os describes na pasta interfaces_saida/describes
+2. Execute o script interface.py
+
+# Gera sigla
 1. Adicione as ddrs na pasta siglas/ddr/
-1. Rode o arquivo gera_interface.py
+1. Rode o arquivo gera_sigla.py
 1. Ajustar os seguintes campos manualmente nas interfaces
     * Campos que são parametro
     * Campos que são fixed
