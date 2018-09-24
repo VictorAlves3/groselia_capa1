@@ -10,7 +10,6 @@ def run():
 
     return 0
 
-
 def principal(nome_arquivo):
     ddr = load_excel(nome_arquivo)
     indice, fluxos = separa_abas(ddr)
@@ -108,6 +107,7 @@ def separa_abas(ddr):
 
 
 def gera_interface(aba, codigo_sistema):
+    describes = load_describes()
     interface_path = "./siglas/{}0/interface/".format(codigo_sistema)
     linhas = aba.values
     nome = aba.keys()[1]
@@ -125,15 +125,37 @@ def gera_interface(aba, codigo_sistema):
         campo["input"] = str(linha[7])
         campo["type"] = str(linha[8])
         campo["data_type"] = str(linha[3])
-        campo["data_size"] = str(linha[4])
+        campo["data_size"] = str(linha[4]).replace("(","").replace(")","").replace(",",".")
         campo = trata_campos(campo)
         campos.append(campo)
+
+    nome_describe = nome.lower().replace("he0_","")
+    try:
+        describe = describes[nome_describe]
+    except:
+        print("describe do fluxo {} não encontrado".format(nome_describe))
+        return 0
+
+    lista = describe["column_definition"]
+    lista = { x["output"] :lista.index(x) for x in lista if len(x["output"]) > 3}
+
+    for campo in campos:
+        if len(campo["output"]) > 3 :
+            try:
+                if "input" in campo.keys():
+                    describe["column_definition"][lista[campo["output"]]]["input"] = campo["input"]
+
+                describe["column_definition"][lista[campo["output"]]]["type"] = campo["type"]
+                describe["column_definition"][lista[campo["output"]]]["data_size"] = campo["data_size"]
+
+            except:
+                print("erro no campo: {}".format(campo))
 
     if not os.path.exists(interface_path):
         os.makedirs(interface_path)
 
     with open(interface_path + interface_name.lower() + "_" + codigo_sistema + ".json","w",encoding='utf8') as file:
-        json.dump(campos,file,indent=4, ensure_ascii=False)
+        json.dump(describe,file,indent=4, ensure_ascii=False)
         file.close()
 
     return 0
@@ -166,7 +188,9 @@ def gera_fluxos(codigo_sistema, indice):
 
     if not os.path.exists(schema_path):
         os.makedirs(schema_path)
+
     print("         GERANDO FLUXOS       ")
+
     for fluxo in fluxos:
         print(">>> gerando fluxo " + fluxo[0])
         config_json["codigo_sistema_origem"] = fluxo[col["Sigla"]]
@@ -199,12 +223,17 @@ def configura_dict_config(dict_entrada, fluxo):
 
     return dict_entrada
 
+def load_describes():
+    describes_path = "../interfaces_saida/interfaces"
+    describes = ["{}/{}".format(describes_path,x) for x in os.listdir(describes_path)]
+    describes = {x.split("/")[3].split(".")[0].replace("he0_",""):json.loads(open(x,"r").read()) for x in describes}
 
+    return describes
 # main
-try:
-    run()
-except Exception as identifier:
-    print(identifier)
+
+
+run()
+
 
 input("precione enter para finalizar")
 
